@@ -80,6 +80,8 @@ const showModalEditMaterial = (item) => {
     formMaterial.precio = item.precio;
     formMaterial.cantidad = item.cantidad;
     formMaterial.costo = item.costo;
+    formMaterial.unidad = item.unidad;
+    formMaterial.status = item.status;
     modalMaterial.value = true;
 };
 
