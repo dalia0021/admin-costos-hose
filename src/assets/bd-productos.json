@@ -1,0 +1,81 @@
+[
+    {
+        "id":1,
+        "clave": "PAF-MATE-A4-120",
+        "descripcion":"Papel adhesivo fotográfico mate A4 - 120gr",
+        "precio":122.00,
+        "cantidad":50
+    },{
+        "id":2,
+        "clave": "PF-GLOSSY-CARTA-200",
+        "descripcion":"Papel fotográfico premium glossy carta - 200gr",
+        "precio":35.00,
+        "cantidad":20
+    },{
+        "id":3,
+        "clave": "PAF-GLOSSY-CARTA-135",
+        "descripcion":"Papel adhesivo fotográfico glossy carta - 135gr",
+        "precio":120.00,
+        "cantidad":50
+    },{
+        "id":4,
+        "clave": "PAF-GLOSSY-A4-135",
+        "descripcion":"Papel adhesivo fotográfico glossy brillante A4 - 135gr",
+        "precio":95.00,
+        "cantidad":50
+    },{
+        "id":5,
+        "clave": "PF-GLOSSY-2C-A4-120",
+        "descripcion":"Papel fotográfico premium glossy brillante doble cara carta - 120gr",
+        "precio":64.00,
+        "cantidad":50
+    },{
+        "id":6,
+        "clave": "PAF-GLOSSY-A4-90",
+        "descripcion":"Papel adhesivo fotográfico glossy brillante A4 - 90gr",
+        "precio":92.00,
+        "cantidad":50
+    },{
+        "id":7,
+        "clave": "PAF-GLOSSY-LABEL-A4-90",
+        "descripcion":"Papel adhesivo fotográfico glossy brillante A4 - 90gr",
+        "precio":152.00,
+        "cantidad":50
+    },{
+        "id":8,
+        "clave": "PA-TRANSLUCIDO-A4",
+        "descripcion":"Papel adhesivo translúcido A4",
+        "precio":339.00,
+        "cantidad":50
+    },{
+        "id":9,
+        "clave": "PF-MATE-CARTA-230",
+        "descripcion":"Papel fotográfico mate carta - 230gr",
+        "precio":70.00,
+        "cantidad":50
+    },{
+        "id":10,
+        "clave": "PF-GLOSSY-CARTA-230",
+        "descripcion":"Papel fotográfico premium glossy - 230gr",
+        "precio":32.00,
+        "cantidad":20
+    },{
+        "id":11,
+        "clave": "PF-GLOSSY-2C-CARTA-200",
+        "descripcion":"Papel fotográfico premium glossy brillante doble cara carta - 200gr",
+        "precio":88.00,
+        "cantidad":50
+    },{
+        "id":12,
+        "clave": "PF-GLOSSY-4X6-200",
+        "descripcion":"Papel fotográfico premium glossy brillante 4x6 - 200gr",
+        "precio":36.00,
+        "cantidad":"100"
+    },{
+        "id":13,
+        "clave": "PF-GLOSSY-CARTA-260",
+        "descripcion":"Papel fotográfico premium glossy carta - 260gr",
+        "precio":35.00,
+        "cantidad":20
+    }
+]
