@@ -471,7 +471,8 @@ initComponents();
             <Dialog v-model:visible="modalMaterialCosto"
                     :style="{ width: '600px', 'max-width': '90vw' }"
                     header="Calcular costos"
-                    :modal="true"
+                    modal
+                    :closable="false"
                     class="p-fluid">
 
                 <DataView :value="selectedMateriales">
@@ -510,7 +511,7 @@ initComponents();
                                             </div>
                                         </div>
                                         <div class="flex flex-row align-items-center align-content-end">
-                                            <span class="text-lg font-semibold text-900">{{ formatCurrency(item.costo * item.cantidad) }}</span>
+                                            <span class="text-lg font-semibold text-900">{{ formatCurrency(item.costo * (item.base * item.altura)) }}</span>
                                             <Button icon="pi pi-copy"
                                                         @click="duplicateMaterial(item)"
                                                         text
