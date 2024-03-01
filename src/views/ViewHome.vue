@@ -82,20 +82,8 @@ const initComponents = () => {
     fetchListMaterial();
 };
 
-const fetchListMaterial = async () => {
-    listMateriales.value = await appApi.getMaterialList();
-    loading.value = false;
-};
-
-const formatCurrency = (value) => {
-    return value.toLocaleString("es-MX", {
-        style: "currency",
-        currency: "MXN",
-    });
-};
-
 const showModalNewMaterial = () => {
-    resetFormModal();
+    resetModalForm();
     submitted.value = false;
     modalMaterial.value = true;
 };
@@ -131,6 +119,18 @@ const hideModalMaterial = () => {
     submitted.value = false;
 };
 
+const fetchListMaterial = async () => {
+    listMateriales.value = await appApi.getMaterialList();
+    loading.value = false;
+};
+
+
+const duplicateMaterial = (item) => {
+    selectedMateriales.value.push(JSON.parse(
+        JSON.stringify(item)
+    ));
+};
+
 const saveMaterial = async () => {
     submitted.value = true;
 
@@ -155,7 +155,7 @@ const saveMaterial = async () => {
         listMateriales.value.push({ ...formMaterial });
     } 
     modalMaterial.value = false;
-    resetFormModal();
+    resetModalForm();
 };
 
 const confirmDeleteMaterial = (item) => {
@@ -176,6 +176,12 @@ const confirmDeleteMaterial = (item) => {
     });
 };
 
+const formatCurrency = (value) => {
+    return value.toLocaleString("es-MX", {
+        style: "currency",
+        currency: "MXN",
+    });
+};
 
 const getNewID = () => {
     const materialMayor = listMateriales.value.reduce((previous, current) => {
@@ -218,7 +224,12 @@ const getStatusLabel = (status) => {
     }
 };
 
-const resetFormModal = () => {
+const resetModalListSelected = () => {
+    selectedMateriales.value = [];
+    modalMaterialCosto.value = false;
+};
+
+const resetModalForm = () => {
     formMaterial.id = null;
     formMaterial.clave = "";
     formMaterial.descripcion = "";
@@ -504,7 +515,7 @@ initComponents();
                                     </div>
                                     <div v-else class="flex flex-row justify-content-between align-items-center gap-3 flex-1">
                                         <div class="flex flex-row align-items-center">
-                                            <InputNumber v-model="item.cantidad" showButtons buttonLayout="vertical" style="width: 4rem" :min="0" class="mr-2">
+                                            <InputNumber v-model="item.cantidad" showButtons buttonLayout="vertical" variant="outlined" style="width: 4rem" :min="0" class="mr-2">
                                                 <template #incrementbuttonicon>
                                                     <span class="pi pi-plus" />
                                                 </template>
@@ -520,9 +531,14 @@ initComponents();
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="flex flex-column align-items-end">
-                                            <span class="text-lg font-semibold text-900 mt-2">{{ formatCurrency(item.costo * item.cantidad) }}</span>
+                                        <div class="flex flex-row align-items-center align-content-end">
+                                            <span class="text-lg font-semibold text-900">{{ formatCurrency(item.costo * item.cantidad) }}</span>
+                                            <Button icon="pi pi-copy"
+                                                        @click="duplicateMaterial(item)"
+                                                        text
+                                                        rounded />
                                         </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -543,7 +559,7 @@ initComponents();
                     <Button label="Cerrar"
                             icon="pi pi-times"
                             text
-                            @click="modalMaterialCosto = false" />
+                            @click="resetModalListSelected()" />
                 </template>
             </Dialog>
         </div>
