@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { collection, getFirestore, doc, setDoc, getDocs, query, updateDoc, orderBy  } from "firebase/firestore";
+import { collection, getFirestore, doc, setDoc, getDocs, query, updateDoc, deleteDoc, orderBy  } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -28,22 +28,31 @@ export const useApi = () => {
   const addMaterial = async (data) => {
     try { 
         await setDoc(doc(db, "materiales", data.id.toString()), data);
-      } catch (e) {
+    } catch (e) {
         console.error("Error adding document: ", e);
-      }
+    }
   }
 
   const updateMaterial = async (id, data) => {
     try {
         await updateDoc(doc(db, "materiales", id.toString()), data);
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
+    } catch (e) {
+        console.error("Error updating document: ", e);
+    }
+  };
+
+  const deleteMaterial = async (id) => {
+    try {
+        await deleteDoc(doc(db, "materiales", id.toString()));
+    } catch (e) {
+        console.error("Error deleting document: ", e);
+    }
   };
 
   return {
     getMaterialList,
     addMaterial,
     updateMaterial,
+    deleteMaterial,
   };
 };

@@ -1,9 +1,14 @@
 <script setup>
 import { useApi } from "@composables/useApi";
 import { FilterMatchMode } from "primevue/api";
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
 import { reactive, ref, watch, computed } from "vue";
 
 const appApi = reactive(useApi());
+
+const confirm = useConfirm();
+const toast = useToast();
 
 const listMateriales = ref([]);
 const formMaterial = reactive({
@@ -15,6 +20,8 @@ const formMaterial = reactive({
     cantidad: 0,
     costo: 0,
     status: "instock",
+    base:0,
+    altura:0
 });
 
 const selectedMateriales = ref();
@@ -37,9 +44,39 @@ const statuses = ref([
 
 const totalCostoSelectedMateriales = computed(() => {
     return selectedMateriales.value.reduce((total, item) => {
+        if(item.unidad == "cm2"){
+            return  total + (item.base * item.altura ) * item.costo
+        }
         return total + item.cantidad * item.costo;
     }, 0);
 });
+
+const getLabelUnidadCantidad = computed(() => {
+    switch (formMaterial.unidad) {
+        case "pza":
+            return "Piezas"
+        case "cm":
+            return "Centimetros"
+        case "ml":
+            return "Militros"
+        case "cm2":
+            return "Centimetros²"
+        case "gm":
+            return "Gramos"
+        default:
+            return "Cantidad"
+    }
+});
+
+watch(
+  () => formMaterial.unidad,
+  (unidad) => {
+    if(unidad != "cm2"){
+        formMaterial.base = 0;
+        formMaterial.altura = 0;
+    }
+  }
+)
 
 const initComponents = () => {
     fetchListMaterial();
@@ -69,6 +106,8 @@ const showModalMaterialCosto = () => {
     );
     selectedMateriales.value.forEach((item) => {
         item.cantidad = 1;
+        item.base = 1;
+        item.altura = 1;
     });
     modalMaterialCosto.value = true;
 };
@@ -82,6 +121,8 @@ const showModalEditMaterial = (item) => {
     formMaterial.costo = item.costo;
     formMaterial.unidad = item.unidad;
     formMaterial.status = item.status;
+    formMaterial.base = item.base;
+    formMaterial.altura = item.altura;
     modalMaterial.value = true;
 };
 
@@ -93,7 +134,13 @@ const hideModalMaterial = () => {
 const saveMaterial = async () => {
     submitted.value = true;
 
-    formMaterial.costo = formMaterial.precio / formMaterial.cantidad;
+    if(formMaterial.base && formMaterial.altura){
+        formMaterial.cantidad = formMaterial.base * formMaterial.altura;
+        formMaterial.costo = formMaterial.precio / formMaterial.cantidad;
+    }else{
+        formMaterial.costo = formMaterial.precio / formMaterial.cantidad;
+    }
+
 
     if (formMaterial.id != null) {
         await appApi.updateMaterial(formMaterial.id, formMaterial);
@@ -106,10 +153,29 @@ const saveMaterial = async () => {
 
         await appApi.addMaterial(formMaterial);
         listMateriales.value.push({ ...formMaterial });
-    }
+    } 
     modalMaterial.value = false;
     resetFormModal();
 };
+
+const confirmDeleteMaterial = (item) => {
+    confirm.require({
+        message: 'Desea borrar material: '+ item.clave + '?',
+        header: 'Eliminar Material',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancelar',
+        acceptLabel: 'Eliminar',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        acceptClass: 'p-button-danger',
+        accept: () => {
+            appApi.deleteMaterial(item.id).then(()=>{
+                listMateriales.value.splice(listMateriales.value.indexOf(item), 1)
+                toast.add({ severity: 'info', summary: 'Confirmado', detail: 'Material eliminado', life: 3000 });
+            });
+        },
+    });
+};
+
 
 const getNewID = () => {
     const materialMayor = listMateriales.value.reduce((previous, current) => {
@@ -120,8 +186,6 @@ const getNewID = () => {
 
     return parseInt(materialMayor.id) + 1;
 };
-
-const confirmDeleteMaterial = () => {};
 
 const exportCSV = () => {
     dt.value.exportCSV();
@@ -163,12 +227,16 @@ const resetFormModal = () => {
     formMaterial.costo = 0.0;
     formMaterial.unidad = "pza";
     formMaterial.status = "instock";
+    formMaterial.base = 0;
+    formMaterial.altura = 0;
 };
 
 initComponents();
 </script>
 
 <template>
+    <Toast />
+    <ConfirmDialog></ConfirmDialog>
     <div class="grid">
         <div class="col-12">
             <div class="flex sm:flex-row flex-column flex-wrap gap-2 justify-content-between">
@@ -328,10 +396,34 @@ initComponents();
                         <div class="field-radiobutton col-6">
                             <RadioButton id="unidad4"
                                          name="unidad"
+                                         value="cm2"
+                                         v-model="formMaterial.unidad" />
+                            <label for="unidad2">Centimetro²</label>
+                        </div>
+                        <div class="field-radiobutton col-6">
+                            <RadioButton id="unidad5"
+                                         name="unidad"
                                          value="gm"
                                          v-model="formMaterial.unidad" />
                             <label for="unidad4">Gramos</label>
                         </div>
+                    </div>
+                </div>
+
+                <div class="formgrid grid" v-if="formMaterial.unidad == 'cm2'">
+                    <div class="field col">
+                        <label for="precio">Base</label>
+                        <InputNumber id="precio"
+                                     v-model="formMaterial.base"
+                                     required="true"
+                                     integeronly/>
+                    </div>
+                    <div class="field col">
+                        <label for="cantidad">Altura</label>
+                        <InputNumber id="cantidad"
+                                     required="true"
+                                     v-model="formMaterial.altura"
+                                     integeronly />
                     </div>
                 </div>
 
@@ -346,11 +438,12 @@ initComponents();
                                      locale="es-MX" />
                     </div>
                     <div class="field col">
-                        <label for="cantidad">Cantidad</label>
+                        <label for="cantidad">{{ getLabelUnidadCantidad }}</label>
                         <InputNumber id="cantidad"
                                      required="true"
                                      v-model="formMaterial.cantidad"
-                                     integeronly />
+                                     integeronly
+                                     :disabled="formMaterial.unidad == 'cm2'" />
                     </div>
                 </div>
                 <template #footer>
@@ -378,18 +471,47 @@ initComponents();
                                  class="col-12">
                                 <div class="flex flex-row align-items-center px-1 gap-3"
                                      :class="{ 'border-top-1 surface-border': index !== 0 }">
-                                    <div class="flex flex-row justify-content-between align-items-center gap-3 flex-1">
+                                    <div v-if="item.unidad == 'cm2'" class="flex flex-row justify-content-between align-items-center gap-3 flex-1">
                                         <div class="flex flex-row align-items-center">
-                                            <div class="flex flex-column mr-1">
-                                                <Button icon="pi pi-angle-up"
-                                                        @click="item.cantidad += 1"
-                                                        text
-                                                        rounded />
-                                                <Button icon="pi pi-angle-down"
-                                                        @click="item.cantidad -= 1"
-                                                        text
-                                                        rounded />
+                                            <InputNumber v-model="item.base" showButtons buttonLayout="vertical" style="width: 4rem" :min="0" class="mr-2">
+                                                <template #incrementbuttonicon>
+                                                    <span class="pi pi-plus" />
+                                                </template>
+                                                <template #decrementbuttonicon>
+                                                    <span class="pi pi-minus" />
+                                                </template>
+                                            </InputNumber>
+                                            <span class="mr-2">x</span>
+                                            <InputNumber v-model="item.altura" showButtons buttonLayout="vertical" style="width: 4rem" :min="0" class="mr-2">
+                                                <template #incrementbuttonicon>
+                                                    <span class="pi pi-plus" />
+                                                </template>
+                                                <template #decrementbuttonicon>
+                                                    <span class="pi pi-minus" />
+                                                </template>
+                                            </InputNumber>
+                                            <div class="flex flex-row justify-content-between align-items-start">
+                                                <div>
+                                                    <b class="text-sm">{{ item.clave }}</b>
+                                                    <div class="text-secondary text-sm">{{ item.descripcion }}</div>
+                                                    <small class="text-primary">{{ item.base * item.altura }} {{ item.unidad }} x {{ formatCurrency(item.costo) }} </small>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <div class="flex flex-column align-items-end">
+                                            <span class="text-lg font-semibold text-900 mt-2">{{ formatCurrency(item.costo * (item.base * item.altura )) }}</span>
+                                        </div>
+                                    </div>
+                                    <div v-else class="flex flex-row justify-content-between align-items-center gap-3 flex-1">
+                                        <div class="flex flex-row align-items-center">
+                                            <InputNumber v-model="item.cantidad" showButtons buttonLayout="vertical" style="width: 4rem" :min="0" class="mr-2">
+                                                <template #incrementbuttonicon>
+                                                    <span class="pi pi-plus" />
+                                                </template>
+                                                <template #decrementbuttonicon>
+                                                    <span class="pi pi-minus" />
+                                                </template>
+                                            </InputNumber>
                                             <div class="flex flex-row justify-content-between align-items-start">
                                                 <div>
                                                     <b class="text-sm">{{ item.clave }}</b>
