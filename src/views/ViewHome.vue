@@ -264,7 +264,7 @@ initComponents();
                             severity="success"
                             class=""
                             @click="showModalNewMaterial" />
-                    <Button label="Calcular costo"
+                    <Button label="Calcular costos"
                             icon="pi pi-calculator"
                             severity="primary"
                             class=""
@@ -469,10 +469,9 @@ initComponents();
                 </template>
             </Dialog>
             <Dialog v-model:visible="modalMaterialCosto"
-                    :style="{ width: '600px', 'max-width': '90vw' }"
+                    :style="{ width: '600px', 'max-width': '95vw' }"
                     header="Calcular costos"
                     modal
-                    :closable="false"
                     class="p-fluid">
 
                 <DataView :value="selectedMateriales">
@@ -481,11 +480,11 @@ initComponents();
                             <div v-for="(item, index) in slotProps.items"
                                  :key="index"
                                  class="col-12">
-                                <div class="flex flex-row align-items-center px-1 gap-3"
-                                     :class="{ 'border-top-1 surface-border': index !== 0 }">
+                                <div class="flex flex-row align-items-center px-1 gap-3 pb-1"
+                                     :class="{ 'border-top-1 surface-border pt-1': index !== 0 }">
                                     <div v-if="item.unidad == 'cm2'" class="flex flex-row justify-content-between align-items-center gap-3 flex-1">
                                         <div class="flex flex-row align-items-center">
-                                            <InputNumber v-model="item.base" showButtons buttonLayout="vertical" style="width: 4rem" :min="0" class="mr-2">
+                                            <InputNumber v-model="item.base" showButtons buttonLayout="vertical" style="width: 3rem; min-width: 3rem;" :min="0" class="mr-2">
                                                 <template #incrementbuttonicon>
                                                     <span class="pi pi-plus" />
                                                 </template>
@@ -494,7 +493,7 @@ initComponents();
                                                 </template>
                                             </InputNumber>
                                             <span class="mr-2">x</span>
-                                            <InputNumber v-model="item.altura" showButtons buttonLayout="vertical" style="width: 4rem" :min="0" class="mr-2">
+                                            <InputNumber v-model="item.altura" showButtons buttonLayout="vertical" style="width: 3rem; min-width: 3rem;" :min="0" class="mr-2">
                                                 <template #incrementbuttonicon>
                                                     <span class="pi pi-plus" />
                                                 </template>
@@ -504,8 +503,8 @@ initComponents();
                                             </InputNumber>
                                             <div class="flex flex-row justify-content-between align-items-start">
                                                 <div>
-                                                    <b class="text-sm">{{ item.clave }}</b>
-                                                    <div class="text-secondary text-sm">{{ item.descripcion }}</div>
+                                                    <small><b class="text-sm">{{ item.clave }}</b></small><br>
+                                                    <small>{{ item.descripcion }}</small><br>
                                                     <small class="text-primary">{{ item.base * item.altura }} {{ item.unidad }} x {{ formatCurrency(item.costo) }} </small>
                                                 </div>
                                             </div>
@@ -520,7 +519,7 @@ initComponents();
                                     </div>
                                     <div v-else class="flex flex-row justify-content-between align-items-center gap-3 flex-1">
                                         <div class="flex flex-row align-items-center">
-                                            <InputNumber v-model="item.cantidad" showButtons buttonLayout="vertical" style="width: 4rem" :min="0" class="mr-2">
+                                            <InputNumber v-model="item.cantidad" showButtons buttonLayout="vertical" style="width: 3rem; min-width: 3rem;" :min="0" class="mr-2">
                                                 <template #incrementbuttonicon>
                                                     <span class="pi pi-plus" />
                                                 </template>
@@ -530,8 +529,8 @@ initComponents();
                                             </InputNumber>
                                             <div class="flex flex-row justify-content-between align-items-start">
                                                 <div>
-                                                    <b class="text-sm">{{ item.clave }}</b>
-                                                    <div class="text-secondary text-sm">{{ item.descripcion }}</div>
+                                                    <small><b class="text-sm">{{ item.clave }}</b></small><br>
+                                                    <small>{{ item.descripcion }}</small><br>
                                                     <small class="text-primary">{{ item.cantidad }} {{ item.unidad }} x {{ formatCurrency(item.costo) }} </small>
                                                 </div>
                                             </div>
@@ -559,13 +558,6 @@ initComponents();
                         <span class="text-xl font-semibold text-primary">{{ formatCurrency(totalCostoSelectedMateriales) }}</span>
                     </div>
                 </div>
-
-                <template #footer>
-                    <Button label="Cerrar"
-                            icon="pi pi-times"
-                            text
-                            @click="resetModalListSelected()" />
-                </template>
             </Dialog>
         </div>
     </div>
